@@ -148,7 +148,7 @@ title-separator: "-"
 # Output options (more information on Jekyll's site)
 
 #default local timezone
-timezone: null
+timezone: China/Beijing
 
 markdown: kramdown
 highlighter: rouge
