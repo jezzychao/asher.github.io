@@ -1,0 +1,32 @@
+c++为了支持分离式编译，将声明和定义区分开来。
+声明：规定了变量的类型和名字；
+定义：规定了变量的类型和名字，同时申请存储空间，也可能会变量赋予初始值。
+变量只能被定义一次，但是可以多次声明。
+
+1.
+如果想声明一个变量，而非定义它，就在声明前加关键字 extern，并且不能显示的初始化变量：
+
+extern int i;           //声明变量，不定义
+int i;                  //声明并且定义
+extern int i = 2        //声明并且定义,赋值操作抵消了 extern 的作用
+
+在函数体内部，如果试图初始化一个有 extern 标记的变量，将引发错误。
+
+
+2.
+在多个文件之间共享 const 对象，必须在变量前标记 extern。因为 const 对象在默认情况下只在本文件内生效，载不同文件中的多个同名的 const 对象是各自独立的变量。
+对于 const 变量无论是定义还是声明都添加 extern ，结合第1点的结论。对于 nonconst 对象一样如此
+//fileA
+extern const int ci = 0;
+//fileB
+extern const int ci;
+
+
+3.
+控制模版显示实例化时，extern 标记的模版声明不会再本文件中生成实例化的代码，而是会使用程序中已经显示实例化的代码。
+只需要在声明的时标记 extern,在定义的时不需要 extern.
+//file
+extern template class Bolb<std::string>;        //declaration
+//templateBuild.h
+template class Bolb<std::string>{};             //definition
+

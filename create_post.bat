@@ -8,6 +8,7 @@ if exist %cd%\%filepath% echo Already exist file: %cd%\%filepath% && goto reInpu
 echo ---> %filepath%
 echo layout: post>> %filepath%
 echo title: new post>> %filepath%
+echo tags: [books, test]>> %filepath%
 echo --->> %filepath%
 echo create file successfully!
 pause

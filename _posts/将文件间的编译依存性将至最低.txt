@@ -1,0 +1,142 @@
+C++并没有把‘将接口从实现中分离’这事做的很好。class的定义式不只是详细叙述了接口，还包括实现的细目。
+
+1.第一种是文件依赖性很高的情况。这种实现方式一旦 Date 的实现文件做了修改，那么 person 文件也需要重新编译和连接。
+	#include <string>
+	#include "date.h"
+
+	class Person{
+	public:
+		Person(const std::string &name, const Date &birthday);
+		std::string name() const;
+		Date birthday() const;
+	private:
+		std::string _name;	//实现的细目
+		Date _birthday;		//实现的细目
+	};
+
+2.第二种方式是使用前置声明来代替 #include 命令。关于前置声明，存在的一个问题就是编译器在编译期间必须知道对象的大小，编译器是无法知道前置声明的不完全类的对象大小。
+  对于标准库文件直接采用 #include 就可以了，不需要前置声明，而且这种前置声明比较复杂，不建议尝试。如果真的遇到这种问题，建议修改程序设计。
+  下面这个是无法通过编译的例子：
+    #include <string> //namespace std{
+					  //	class vector;
+					  //}
+	class Date;
+	class Person{
+	public:
+		Person(const std::string &name, const Date &birthday);
+		std::string name() const;
+		Date birthday() const;
+	private:
+		std::string _name;
+		Date _birthday;		//编译Person时无法获知 _birthday 对象的大小。
+	};
+
+3.针对 Person 我们可以把它分割为2个classes,一个负责提供接口，一个负责实现该接口。具体的实现细节就是在 main class(Person) 中除了接口函数外只包含一个指针成员，该指针成员指向其实现类。这种设计常被称为 pimp idiom(pimp: pointer to implementation, ), 指针一般命名为 pImpl。
+这个分离的关键在于以“声明的依存性”替换“定义的依存性”，那正是编译依存性最小化的本质：让头文件尽可能自我满足，如果做不到，则让它与其他文件内的声明式(不是定义式)相依赖。这个设计策略可以总结为3点：
+	a.如果使用 object references 或 object pointers 可以完成任务，就不要使用 objects。
+	b.如果可行，尽量以 class 声明式替换 class 定义式。这里值得主义的一点就是：当声明一个函数用到某个 class 时，我们并不需要该 class 的定义，纵使函数以 by-value 的方式传递该类型的参数(或返回值)亦然；但是在函数的调用之前，class 的定义式必须先曝光。
+	c.为声明式和定义式提供不同的头文件，声明式头文件命名在文件名后加fwd(datefwd.h)。这条准则是为了促进严守上述准则。理解起来就是：以 Date 为例子，用 #include "datefwd.h" 替换前置声明 class Date。
+
+使用 pimp idiom 的 classes,往往被称为 Handle classes(句柄类)。接口类将该类需要做的事情转交给实现类，由实现类来完成。Handle classes 有2种制作方案。
+方案一：
+	/*personImpl.h*/
+	#include <string>
+	#include "Date.h"	//必须曝光定义式，编译器需要知道 PersinImpl 的类型大小
+	class PersonImpl{
+		public:
+			PersonImpl(const std::string &, const Date &);
+			std::string name() const;
+			Date birthday() const;
+		private:
+			std::string _name;
+			Date _birthday;
+	};
+
+
+	/*personImpl.cpp*/
+	#include "personImpl.h"
+	PersonImpl::PersonImpl(const std::string &name, const Date &birthday)
+		: _name(name), _birthday(birthday){
+	}
+
+	std::string PersonImpl::name() const{
+		return _name;
+	}
+
+	Date PersonImpl::birthday() const{
+		return _birthday;
+	}
+
+
+	/*person.h*/
+	#include <string>
+	#include <memory>
+	class PersonImpl;
+	class Date;
+	class Person{
+		public:
+			Person(const std::string &, const Date &);
+			std::string name() const;
+			Date birthday() const;
+		private:
+			std::shared_ptr<PersonImpl> pImpl;
+	};
+
+
+	/*person.cpp*/
+	#include "person.h"
+	#include "personImpl.h"
+	//#include "Date"
+	Person::Person(const std::string &name, const Date &birthday)
+		: pImpl(new PersonImpl(name, birthday)){
+	}
+
+	std::string Person::name() const{
+		return pImpl->name();
+	}
+
+	Date birthday() const {
+		return pImp->dirthday();
+	}
+
+
+方案二：
+	令 Person 成为一种特殊的抽象基类(abstract class)，称为 interface class(类似 Java 和 .Net 中的interface)。
+	C++中这种类的实现主要是：描述 derived classes 的接口，通常不带成员变量，不带 ctor，只有一个 virtaul dtor 和 一组 pure virtual 函数。
+	interface class 的客户通常调用一个 abstract class 的静态方法来创建 derived classes 的实例，并返回该实例的智能指针。这样的函数称为 factory function 或 virtual ctor。
+
+	/*person.h*/
+	#include <string>
+	#include <memory>
+	class Date;
+	class Person{
+		public:
+			virtual ~Person();
+			virtual std::string name() const = 0;
+			virtual Date birthday() const = 0;
+			static std::shared_ptr<Person> create(const std::string &, const Date &);//如果该 interface class 有多个 derived class，我们可以在此方法中传入额外的参数来创建不同的 derived class 实例。
+	};
+
+	/*person.cpp*/
+	#include "realperson.h"
+	std::shared_ptr<Person> Person::create(const std::string &n, const Date &d){
+		return std::make_shared<Person>(new RealPerson(n, d));
+	}
+
+
+	/*realperson.h, 不能和 interface class 在同一个头文件中，因为具象类会导入其他依赖的头文件*/
+	#include "person.h"
+	#include "Date.h"
+	class RealPerson: public Person{
+		public:
+			RealPerson(const std::string &, const Date &);
+			std::string name() const override;
+			Date birthday() const override;
+		private:
+			std::string _name;
+			Date _birthday;
+	};
+
+
+总结：
+	Handle classes and Interface classes 解除了接口和实现之间的耦合关系，从而降低文件间的编译依存性，但是也会付出一些代价：在运行期间丧失若干速度，又为每个对象超额付出若干内存。在程序发展过程中使用 Handle classes and Interface classes 以求实现代码有所变化时对客户端带来最小的冲击。而当他们导致速度、大小差异过于重大以至于 classes 间的耦合不成为关键时，就以具象类来替换 Handle classes and Interface classes。
