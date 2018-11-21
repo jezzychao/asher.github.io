@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Markdown 语法总结
-tags： [Syntax, Markdown]
+tags: [Syntax, Markdown]
 ---
 
 [语法参考](https://www.markdowntutorial.com)
