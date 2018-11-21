@@ -11,8 +11,10 @@ tags: [Syntax, Markdown]
 2. 粗体表示: \*\*text\*\*
 3. 斜体加粗: \*\*\_text\_\*\*
 
+
 #### Headers
 使用#可以表示1-6级不同的标题。一般来说，1级标题和6级标题应该谨慎使用。不能把标题加粗但是可以使用斜体字。
+
 
 #### Links
 可以对 Markdown 中的文本和 headers 使用 links，可以用斜体和粗体修饰，在 Markdown 中有2种不同的链接类型
@@ -30,6 +32,7 @@ tags: [Syntax, Markdown]
     [another-link]: www.google.com
 ```
 
+
 #### Images
 创建图片的语法和创建链接的语法很相似。Images 也有2种方法可以使用。
 
@@ -42,6 +45,7 @@ tags: [Syntax, Markdown]
 ![The second first father][Second Father]
 [Second Father]:http://octodex.github.com/images/foundingfather_v2.png
 ```
+
 
 #### Blockquotes
 1. 如果需要对整段内容进行引用，只需要在段首添加">"即可。For example:
@@ -60,6 +64,7 @@ tags: [Syntax, Markdown]
  > Cranly did not answer.
 ```
 3. 块引用也可以包含其他的标记元素，如 Italics, Bold, Images and Links。
+
 
 #### Lists
 Markdown 可以创建2种不同类型的列表：有序列表和无序列表。有序列表使用"数字+点+空格"来表述`1. `，无序列表通过使用"\*+空格"来表述`* `。列表中的文本也可以使用其他的标记元素，如 Italics, Bold, Images and Links。列表当然也可以嵌套使用，我们需要记住的就是内部列表比外部列表要多缩进一个空格。有序列表和无序列表可以相互嵌套，但是最好不要超过三层。For example:
@@ -98,6 +103,7 @@ Markdown 可以创建2种不同类型的列表：有序列表和无序列表。�
 1. 如果列表和代码框/引用块相邻，宁可多空出一行，否则会使代码框/引用块无效。
 2. 在其他的文本段落之后直接使用列表，即使使用 _soft breaks_ ，也不能实现换行，并且列表会直接接在文本之后，也就是列表无效了。所以，同样的多空一行就可以了。
 3. 如果列表中的文本需要缩进对齐，则缩进一个空格就可以了。
+
 
 #### Paragraphs
 如果需要换行但又不想多空一行，可以在换行的位置输入2个空格+回车来完成（最好在编辑器中设置显示空格）。For example:
