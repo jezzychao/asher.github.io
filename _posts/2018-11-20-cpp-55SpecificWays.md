@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 改善程序和设计的55个具体做法
-tags： [C++]
+tags: [C++]
 ---
 
 ## 设计声明
