@@ -3,6 +3,7 @@ layout: post
 title: 改善程序和设计的55个具体做法
 tags： [C++]
 ---
+
 ## 设计声明
 
 ### 19.设计class应当以 build-in types 为标准。
