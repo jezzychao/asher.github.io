@@ -101,6 +101,7 @@ swap(obj1,obj2);	//如果 obj 是和类类型相关的，则会将对应类的 s
 ### 26.尽可能的延后变量定义式的出现时间。
 
 * 避免无意义的 default 构造行为，通俗的说就是在给变量赋值的时候要使用构造函数，而不是先 default 构造再赋值的操作：
+
 ```
 std::string s("helloworld");	//good
 std::string s = "helloworld";	//bad,std::string的构造函数时explicit的，所以执行步骤是1.default ctor, 2.then call operator=;
@@ -108,7 +109,9 @@ std::string s = "helloworld";	//bad,std::string的构造函数时explicit的，�
 std::string s;					//very bad;
 s = "helloworld";
 ```
+
 * 如果变量只在循环内使用，该如何定义？
+
 ```
 //方法A: 定义于循环外
 Widget w;
@@ -121,7 +124,8 @@ for(int i = 0 ; i != n ; ++i){
 	Widget w = 取决于i的值；
 }
 ```
- 成本比较：
+
+ 成本比较：  
  A：1个构造函数 + 1个析构函数 + n个赋值操作；同时w的作用域覆盖整个循环，有时会对程序的可理解性和易维护性造成冲突；  
  B：n个构造函数 + n个析构函数；  
  so:除非（1）我们知道赋值成本比"构造+析构"成本低，（2）除非你正在处理代码中效率高敏感的部分，否则应该使用B。
