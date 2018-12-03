@@ -40,7 +40,6 @@ auto a = r;//a 是 int，而不是 int &
 ```
 int i = 0；
 const int ci = i, &cr = ci;
-
 auto b = ci;	//int，ci 的top-level-const 被忽略掉了
 auto c = cr;	//int，根据第一条规则，真正参与初始化的是 ci，ci 本身是一个 top-level-const
 auto d = &i；	//int *，这个不需要解释
